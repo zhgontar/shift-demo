@@ -1,0 +1,1 @@
+// Placeholder seed indicators script

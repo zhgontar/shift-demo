@@ -1,0 +1,30 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "src/server.ts",
+  "scripts": {
+    "dev": "ts-node src/server.ts",
+    "prisma:studio": "npx prisma studio",
+    "prisma:migrate": "npx prisma migrate dev"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "pdfkit": "^0.17.2",
+    "prisma": "^6.16.3",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.7",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^20.19.21",
+    "@types/pdfkit": "^0.17.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

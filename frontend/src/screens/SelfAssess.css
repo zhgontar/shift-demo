@@ -1,0 +1,37 @@
+.sa-wrap { padding: 12px; }
+
+.sa-card {
+  background:#fff; border:1px solid #e5e7eb; border-radius:14px;
+  padding:20px; box-shadow:0 4px 10px rgba(0,0,0,.04);
+}
+
+.sa-title {
+  font-size:26px; font-weight:800; color:#0f172a; margin:6px 0 14px;
+}
+
+.sa-intro {
+  color:#334155; margin: 0 0 18px; line-height:1.5;
+}
+
+.sa-buttons { display:flex; flex-direction:column; gap:18px; }
+
+.sa-btn {
+  display:flex; align-items:flex-start; gap:14px;
+  background:#0e4a4a; color:#fff; text-decoration:none;
+  padding:18px; border-radius:12px;
+  box-shadow:0 3px 8px rgba(0,0,0,.12);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+.sa-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:0 6px 14px rgba(0,0,0,.16);
+  opacity:.95;
+}
+
+.sa-btn-num {
+  font-weight:800; font-size:20px; opacity:.9;
+  background:#fff; color:#0e4a4a;
+  border-radius:8px; padding:6px 10px;
+}
+.sa-btn-title { font-weight:700; font-size:18px; margin-bottom:4px; }
+.sa-btn-desc { font-size:14px; opacity:.9; line-height:1.4; }

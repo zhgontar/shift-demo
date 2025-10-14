@@ -1,0 +1,56 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          String        @id @default(cuid())
+  email       String        @unique
+  name        String?
+  password    String?
+  createdAt   DateTime      @default(now())
+
+  assessments Assessment[]
+}
+
+model Assessment {
+  id          String     @id
+  userId      String?
+  user        User?      @relation(fields: [userId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  answers     Answer[]
+  notes       SectionNote[]
+}
+
+model Answer {
+  id            String   @id @default(cuid())
+  assessmentId  String
+  pillar        String   // 'E' | 'S' | 'G'
+  questionId    String   // np. 'E1'
+  value         Int      // 1..5 (lub 0..5, jeśli używasz 0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  Assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, pillar, questionId], name: "assessmentId_pillar_questionId")
+  @@index([assessmentId, pillar])
+}
+
+model SectionNote {
+  id            String   @id @default(cuid())
+  assessmentId  String
+  pillar        String   // 'E' | 'S' | 'G'
+  text          String   @default("")
+  updatedAt     DateTime @updatedAt
+
+  Assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, pillar], name: "assessmentId_pillar")
+}
