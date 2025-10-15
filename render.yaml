@@ -3,24 +3,29 @@ services:
     name: shift-api
     runtime: node
     plan: free
+    region: frankfurt
     rootDir: backend
     buildCommand: |
-      npm ci
-      npm run prisma:generate
+      npm install --include=dev
+      npx prisma generate
       npm run build
-    # preDeployCommand: (USUNIĘTE na free)
     startCommand: |
       npx prisma migrate deploy || npx prisma db push
-      npm run start
+      node dist/server.js
     envVars:
       - key: NODE_ENV
         value: production
+        key: NPM_CONFIG_PRODUCTION
+        value: "false"
+      - key: NODE_VERSION
+        value: 18
       - key: DATABASE_URL
-        value: file:./dev.db   # plik w katalogu backend (EFEMERYCZNY)
+        value: file:./dev.db   # plik obok kodu; efemeryczny ale OK do testów
 
   - type: web
     name: shift-frontend
     runtime: static
+    region: frankfurt
     rootDir: frontend
     buildCommand: |
       npm ci
