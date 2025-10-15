@@ -1,5 +1,5 @@
 services:
-  # === BACKEND (Express + Prisma + SQLite) ===
+  # === BACKEND (Express + Prisma + SQLite na trwałym dysku) ===
   - type: web
     name: shift-api
     env: node
@@ -22,21 +22,15 @@ services:
       - key: DATABASE_URL
         value: file:/var/data/dev.db
 
-  # === FRONTEND (Vite static site) ===
-  - type: static_site
-    name: shift-frontend
+staticSites:
+  # === FRONTEND (Vite – statyczny) ===
+  - name: shift-frontend
     rootDir: frontend
     buildCommand: |
       npm install
       npm run build
     publishPath: dist
+    # Uwaga: jeśli 'fromService' nie zadziała w Twoim koncie, ustawisz ręcznie VITE_API_BASE w panelu
     envVars:
-      # Automatycznie wstrzyknij publiczny URL backendu do Vite
-      - key: VITE_API_BASE
-        fromService:
-          name: shift-api
-          type: web
-          property: url
-      # (opcjonalne brandowanie)
       - key: VITE_PROJECT_TITLE
         value: SHIFT - Digital Readiness Assessment
