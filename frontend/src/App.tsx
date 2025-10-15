@@ -7,6 +7,7 @@ import Graphs from './screens/Graphs'
 import Settings from './screens/Settings'
 import Training from './screens/Training'
 import Layout from './components/Layout'
+console.log('>>> VITE_API_BASE =', import.meta.env.VITE_API_BASE);
 
 export default function App() {
   return (
