@@ -25,7 +25,6 @@ services:
   - type: web
     name: shift-frontend
     runtime: static
-    region: frankfurt
     rootDir: frontend
     buildCommand: |
       npm ci

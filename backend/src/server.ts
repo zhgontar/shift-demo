@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express'
-import cors = require('cors')
+import cors from 'cors'
 import { PrismaClient, Prisma } from '@prisma/client'
 import { randomUUID } from 'crypto'
-import cookieParser = require('cookie-parser')
+import cookieParser from 'cookie-parser'
 import { requireAuth } from './middleware/auth'
 import jwt from 'jsonwebtoken'
-import PDFDocument = require('pdfkit')
+import PDFDocument from 'pdfkit'
 import { getMatrixCached, refreshMatrix } from './excelMatrix'
 import { scoreAssessmentByCategory } from './scoring'
 
@@ -154,9 +154,9 @@ app.post('/assessments/:id/score', async (req: Request, res: Response) => {
   const { id } = req.params
   const rows = await prisma.answer.findMany({ where: { assessmentId: id } })
 
-  const E = rows.filter((r) => r.pillar === 'E').map((r) => r.value)
-  const S = rows.filter((r) => r.pillar === 'S').map((r) => r.value)
-  const G = rows.filter((r) => r.pillar === 'G').map((r) => r.value)
+  const E = rows.filter((r: { pillar: string }) => r.pillar === 'E').map((r: { value: any }) => r.value)
+  const S = rows.filter((r: { pillar: string }) => r.pillar === 'S').map((r: { value: any }) => r.value)
+  const G = rows.filter((r: { pillar: string }) => r.pillar === 'G').map((r: { value: any }) => r.value)
 
   const your = { E: +avg(E).toFixed(2), S: +avg(S).toFixed(2), G: +avg(G).toFixed(2) }
   const overall = +avg([your.E, your.S, your.G].filter((v) => v > 0)).toFixed(2)
@@ -178,7 +178,7 @@ app.post('/assessments/:id/score/detailed', async (req, res) => {
 app.get('/assessments/:id/scores', async (req: Request, res: Response) => {
   const { id } = req.params
   const rows = await prisma.answer.findMany({ where: { assessmentId: id } })
-  const pick = (p: 'E' | 'S' | 'G') => rows.filter((r) => r.pillar === p).map((r) => r.value)
+  const pick = (p: 'E' | 'S' | 'G') => rows.filter((r: { pillar: string }) => r.pillar === p).map((r: { value: any }) => r.value)
 
   const your = {
     E: +avg(pick('E')).toFixed(2),
@@ -205,7 +205,7 @@ app.get('/assessments/:id/report.pdf', async (req: Request, res: Response) => {
 
   // 1) dane do raportu (te same co do wykresów)
   const rows = await prisma.answer.findMany({ where: { assessmentId: id } })
-  const pick = (p: 'E'|'S'|'G') => rows.filter(r => r.pillar === p).map(r => r.value)
+  const pick = (p: 'E'|'S'|'G') => rows.filter((r: { pillar: string }) => r.pillar === p).map((r: { value: any }) => r.value)
   const avg = (arr: number[]) => (arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0)
 
   const your = {
@@ -218,7 +218,7 @@ app.get('/assessments/:id/report.pdf', async (req: Request, res: Response) => {
   const overallAvg  = +avg([avgScores.E, avgScores.S, avgScores.G]).toFixed(2)
 
   const notes = await prisma.sectionNote.findMany({ where: { assessmentId: id } })
-  const noteMap = Object.fromEntries(notes.map(n => [n.pillar, n.text]))
+  const noteMap = Object.fromEntries(notes.map((n: { pillar: any; text: any }) => [n.pillar, n.text]))
 
   // 2) nagłówki odpowiedzi HTTP
   res.setHeader('Content-Type', 'application/pdf')
