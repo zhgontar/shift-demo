@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import { PrismaClient, Prisma } from '@prisma/client'
 import { randomUUID } from 'crypto'
@@ -12,7 +12,15 @@ import { scoreAssessmentByCategory } from './scoring'
 const app = express()
 const prisma = new PrismaClient()
 const MATRIX_XLSX = process.env.MATRIX_XLSX || './data/shift_matrix.xlsx'
-
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || '*';
+app.set('trust proxy',1)
+app.use(
+  cors({
+    origin: FRONTEND_ORIGIN,
+    credentials: true,
+  })
+);
+type LoginBody = {email: string; password: string};
 // middleware
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
 app.use(express.json())
@@ -33,26 +41,45 @@ app.get('/matrix', async (req: Request, res: Response) => {
   }
 })
 
-app.post('/auth/login', async (req: Request, res: Response) => {
-  const email = String(req.body?.email || '').trim().toLowerCase()
-  if (!email) return res.status(400).json({ error: 'Email required' })
+app.post('/api/auth/login', async (req: Request<{}, {}, LoginBody>, res: Response) => {
+  const { email, password } = req.body;
+  // TODO: sprawdź użytkownika w DB
+  const ok = email && password; // podmień na realną walidację
+  if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
 
-  const user = await prisma.user.upsert({
-    where: { email },
-    update: {},
-    create: { email }
-  })
+  const token = jwt.sign({ sub: email }, process.env.JWT_SECRET || 'dev', { expiresIn: '7d' });
 
-  const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET || 'dev', { expiresIn: '30d' })
-  res.cookie('token', token, { httpOnly: true, sameSite: 'lax' })
-  res.json({ userId: user.id, email: user.email })
-})
+  // ✅ cookie dla przeglądarki przez HTTPS na Render
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: true,        // Render = HTTPS
+    sameSite: 'none',    // do cross-site z domeny frontu
+    maxAge: 7 * 24 * 3600 * 1000,
+    path: '/',
+  });
 
-app.get('/me', requireAuth, async (req: any, res: Response) => {
-  const user = await prisma.user.findUnique({ where: { id: req.userId } })
-  if (!user) return res.status(404).json({ error: 'Not found' })
-  res.json({ id: user.id, email: user.email })
-})
+  res.json({ ok: true });
+});
+
+function auth(req: Request, res: Response, next: NextFunction) {
+  const header = req.headers.authorization;
+  const token =
+    (header?.startsWith('Bearer ') ? header.slice(7) : undefined) ||
+    req.cookies?.token;
+
+  if (!token) return res.status(401).json({ error: 'No token' });
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET || 'dev');
+    next();
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+app.get('/api/me', auth, (_req, res) => {
+  res.json({ ok: true });
+});
 
 // helpers
 const avg = (arr: number[]) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0)
@@ -307,5 +334,5 @@ app.get('/assessments/:id/report.pdf', async (req: Request, res: Response) => {
 // --- Health check ---
 app.get('/health', (_req: Request, res: Response) => res.json({ ok: true }))
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log(`API running at http://localhost:${PORT}`))
+const PORT = Number(process.env.PORT) || 3000;
+app.listen(PORT, () => console.log(`API on ${PORT}`));
