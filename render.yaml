@@ -12,10 +12,10 @@ services:
       npm run build
     startCommand: npm run start
     autoDeploy: true
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGB: 1
+    disks:
+      - name: data
+        mountPath: /var/data
+        sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
@@ -23,15 +23,15 @@ services:
         value: file:/var/data/dev.db
 
   # === FRONTEND (Vite static site) ===
-  - type: static
+  - type: static_site
     name: shift-frontend
     rootDir: frontend
     buildCommand: |
       npm install
       npm run build
-    staticPublishPath: dist
+    publishPath: dist
     envVars:
-      # VITE_API_BASE będzie automatycznie wskazywać publiczny URL backendu
+      # Automatycznie wstrzyknij publiczny URL backendu do Vite
       - key: VITE_API_BASE
         fromService:
           name: shift-api
