@@ -4,8 +4,11 @@
   "main": "src/server.ts",
   "scripts": {
     "dev": "ts-node src/server.ts",
-    "prisma:studio": "npx prisma studio",
-    "prisma:migrate": "npx prisma migrate dev"
+    "build":"tsc",
+    "start": "node dist/server.js",
+    "prisma:generate":"npx prisma generate",
+    "prisma:migrate": "npx prisma migrate deploy",
+    "prisma:studio": "npx prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
