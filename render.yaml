@@ -2,29 +2,27 @@ services:
   - type: web
     name: shift-api
     runtime: node
-    plan: free         # <= darmowa instancja
+    plan: free
     rootDir: backend
     buildCommand: |
-      npm install
+      npm ci
       npm run prisma:generate
       npm run build
-    preDeployCommand: npm run prisma:migrate
-    startCommand: npm run start
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGB: 1
+    # preDeployCommand: (USUNIĘTE na free)
+    startCommand: |
+      npx prisma migrate deploy || npx prisma db push
+      npm run start
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        value: file:/var/data/dev.db
+        value: file:./dev.db   # plik w katalogu backend (EFEMERYCZNY)
 
   - type: web
     name: shift-frontend
     runtime: static
     rootDir: frontend
     buildCommand: |
-      npm install
+      npm ci
       npm run build
     staticPublishPath: ./dist
