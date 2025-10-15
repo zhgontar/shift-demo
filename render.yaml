@@ -1,18 +1,16 @@
 services:
-  # BACKEND (Node + Prisma + SQLite na dysku)
   - type: web
     name: shift-api
-    runtime: node            # zamiast: env: node
+    runtime: node
+    plan: free         # <= darmowa instancja
     rootDir: backend
     buildCommand: |
       npm install
       npm run prisma:generate
       npm run build
-    preDeployCommand: |
-      npm run prisma:migrate  # albo: prisma migrate deploy
+    preDeployCommand: npm run prisma:migrate
     startCommand: npm run start
-    autoDeployTrigger: commit # nowsze pole zamiast deprecated 'autoDeploy'
-    disk:                     # poprawne: 'disk' (pojedynczy), nie 'disks'
+    disk:
       name: data
       mountPath: /var/data
       sizeGB: 1
@@ -22,7 +20,6 @@ services:
       - key: DATABASE_URL
         value: file:/var/data/dev.db
 
-  # FRONTEND (statyczny, np. Vite)
   - type: web
     name: shift-frontend
     runtime: static
@@ -30,8 +27,4 @@ services:
     buildCommand: |
       npm install
       npm run build
-    staticPublishPath: ./dist  # zamiast: publishPath
-    # (opcjonalnie)
-    # envVars:
-    #   - key: VITE_API_BASE
-    #     sync: false  # podasz wartość w UI przy tworzeniu Blueprinta
+    staticPublishPath: ./dist
