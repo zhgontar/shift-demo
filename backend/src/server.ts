@@ -13,6 +13,11 @@ const app = express()
 const prisma = new PrismaClient()
 const MATRIX_XLSX = process.env.MATRIX_XLSX || './data/shift_matrix.xlsx'
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || '*';
+const ORIGINS = (process.env.FRONTEND_ORIGIN || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
 app.set('trust proxy',1)
 app.use(
   cors({
@@ -22,7 +27,6 @@ app.use(
 );
 type LoginBody = {email: string; password: string};
 // middleware
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
 app.use(express.json())
 app.use(cookieParser())
 
