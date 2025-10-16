@@ -24,6 +24,8 @@ export default function Login() {
       if (res.ok) {
         await refresh();                // <- USTAWI isAuthed=true
         setMsg('✅ Zalogowano');
+        localStorage.setItem('auth', '1');
+        window.location.reload();
       } else {
         setMsg(`❌ ${data.error || res.statusText}`);
       }

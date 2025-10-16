@@ -2,7 +2,6 @@ import React from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import LogoutButton from './LogoutButton'
 import './Layout.css'
-
 function LinkItem({
   to,
   icon,
@@ -24,7 +23,9 @@ function LinkItem({
 }
 
 export default function Layout() {
-  const authed = !!localStorage.getItem('assessmentId')
+  const authed = typeof window !== 'undefined' && localStorage.getItem('auth')==='1';
+
+///  const authed = !!localStorage.getItem('assessmentId')
   const { pathname } = useLocation()
 
   return (
