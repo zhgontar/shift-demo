@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './screens/Login'
 import Home from './screens/Home'
 import Category from './screens/Category'
@@ -11,8 +11,10 @@ console.log('>>> VITE_API_BASE =', import.meta.env.VITE_API_BASE);
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
+    <BrowserRouter>
+    <Layout>
+      <Routes>
+      
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/selfassess" element={<Navigate to="/selfassess/environmental" replace/>} />
@@ -22,10 +24,11 @@ export default function App() {
         <Route path="/graphs" element={<Graphs />} />
         <Route path="/training" element={<Training />} />
         <Route path="/settings" element={<Settings />} />
-      </Route>
-
+      
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="*" element={<Navigate to="/home" />} />
     </Routes>
+    </Layout>
+    </BrowserRouter>
   )
 }
